@@ -65,3 +65,43 @@ docker pull mysql:5.7
 docker pull phpmyadmin/phpmyadmin
 
 b. Exécuter deux conteneurs à partir des images et ajouter une table ainsi que quelques enregistrements dans la base de données à l’aide de phpmyadmin
+
+docker run --name mysql-container -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql:5.7
+docker run --name phpmyadmin-container --link mysql-container:db -p 8080:80 -d phpmyadmin/phpmyadmin
+
+8.  Faire la même chose que précédemment en utilisant un fichier docker-compose.yml
+
+docker compose up -d
+
+a. Qu’apporte le fichier docker-compose par rapport aux commandes docker run ? Pourquoi est-il intéressant ?
+
+Cela permet de lancer plusieurs containeurs en même temps. C'est intéressant car cela rend l'utilisation des variables d'environnement plus simple.
+
+b. Quel moyen permet de configurer (premier utilisateur, première base de données, mot de passe root, …) facilement le conteneur mysql au lancement ?
+
+Il s'agit de l'utilisation des variables d'environnement.
+
+9.a. A l’aide de docker-compose et de l’image praqma/network-multitool disponible sur le Docker Hub créer 3 services (web, app et db) et 2 réseaux (frontend et backend).
+Les services web et db ne devront pas pouvoir effectuer de ping de l’un vers l’autre
+
+docker compose up -d
+docker exec -it docker-web-1 //bin/bash
+bash-5.1# ping docker-app-1
+PING docker-app-1 (172.19.0.2) 56(84) bytes of data.
+64 bytes from docker-app-1.docker_frontend (172.19.0.2): icmp_seq=1 ttl=64 time=1.54 ms
+64 bytes from docker-app-1.docker_frontend (172.19.0.2): icmp_seq=2 ttl=64 time=0.062 ms
+64 bytes from docker-app-1.docker_frontend (172.19.0.2): icmp_seq=3 ttl=64 time=0.063 ms
+^C
+--- docker-app-1 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2069ms
+rtt min/avg/max/mdev = 0.062/0.556/1.544/0.698 ms
+bash-5.1# ping docker-db-1
+ping: docker-db-1: Try again
+
+b. Quelles lignes du résultat de la commande docker inspect justifient ce comportement ?
+
+Il s'agit de la ligne contenant l'adresse IP du conteneur, docker-web-1 et docker-bd-1 ne peuvent pas dialoguer puisque l'un est sur 172.18.x.x et l'autre sur 172.19.x.x
+
+c. Dans quelle situation réelles (avec quelles images) pourrait-on avoir cette configuration réseau ? Dans quel but ?
+
+Cette situation peut arriver dans le cas ou nous avons une appli web, une base de données et une api, il ne faut pas que l'appli web puisse communiquer avec la base sans passer par l'api.

@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+    web:
+        image: praqma/network-multitool
+        networks:
+            - frontend
+        restart: always
+        depends_on:
+            - app
+
+    app:
+        image: praqma/network-multitool
+        restart: always
+        networks:
+            - frontend
+            - backend
+        depends_on:
+            - db
+    db:
+        image: praqma/network-multitool
+        networks:
+            - backend
+        restart: always
+
+networks:
+    frontend:
+        driver: bridge
+    backend:
+        driver: macvlan

@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+    mysql:
+        image: mysql:5.7
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: tp01
+            MYSQL_USER: tp01
+            MYSQL_PASSWORD: tp01
+        volumes:
+            - db-data:/var/lib/mysql
+        ports:
+            - "3306:3306"
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        restart: always
+        environment:
+            PMA_HOST: mysql
+            PMA_PORT: 3306
+            MYSQL_ROOT_PASSWORD: my-secret-pw
+        ports:
+            - "8080:80"
+        depends_on:
+            - mysql
+
+volumes:
+    db-data:
